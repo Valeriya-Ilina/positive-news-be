@@ -69,7 +69,7 @@ app.use(
 //controllers
 app.use('/search', require('./controllers/searchController'))
 app.use('/users', require('./controllers/userController'))
-
+app.use('/news', require('./controllers/newsController'))
 
 
 app.listen(PORT, () => {
