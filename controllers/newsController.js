@@ -23,7 +23,7 @@ news.get('/', (req, res) => {
   });
 });
 
-// add article to news
+//Add article to news
 news.post('/', (req, res) => {
   News.create(req.body, (error, createdArticle) => {
     if (error) {
@@ -40,6 +40,34 @@ news.post('/', (req, res) => {
           res.status(201).json(createdArticle)
         };
       });
+    };
+  });
+});
+
+//Update article
+news.put('/:id', (req, res) => {
+  News.findByIdAndUpdate(req.params.id, req.body, {new:true},
+  (error, updatedArticle) => {
+    if (error) {
+      res.status(400).json({error: error.message})
+    }
+    else {
+      res.status(200).json({message: `Article ${updatedArticle.title} updated successfully`, data: updatedArticle})
+    };
+  });
+});
+
+//Delete article
+news.delete('/:id', (req, res) => {
+  News.findByIdAndDelete(req.params.id, (error, deletedArticle) => {
+    if(error) {
+      res.status(400).json({error: error.message})
+    }
+    else if (deletedArticle === null) {
+      res.status(404).json({message: 'Article is not found'})
+    }
+    else {
+      res.status(200).json({message: `"Article" ${deletedArticle.title} deleted successfully`})
     };
   });
 });
