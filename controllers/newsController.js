@@ -3,10 +3,9 @@ const news = express.Router();
 const News = require('../models/newsModel.js');
 const User = require('../models/usersModel.js');
 
-_id = '6161f7026289109fb75cd031'
 // Get News
 news.get('/', (req, res) => {
-  User.findById(_id, (error, foundUser) => {
+  User.findById(req.session.currentUser._id, (error, foundUser) => {
     if (error) {
       res.status(400),json({error: error.message})
     }
@@ -30,7 +29,7 @@ news.post('/', (req, res) => {
       res.status(400).json({error: error.message})
     }
     else {
-      User.findById(_id, (error, foundUser) => {
+      User.findById(req.session.currentUser._id, (error, foundUser) => {
         if (error) {
           res.status(400).json({error: error.message})
         }
