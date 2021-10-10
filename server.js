@@ -6,21 +6,21 @@ const express = require('express')
 const session = require('express-session')
 const app = express()
 
-// const cors = require('cors')
-//
-// const whitelist = [BASEURL]
-// const corsOptions = {
-//   origin: function (origin, callback) {
-//     if (whitelist.indexOf(origin) !== -1 || !origin) {
-//       callback(null, true)
-//     } else {
-//       callback(new Error('Not allowed by CORS'))
-//     }
-//   },
-//   credentials: true
-// }
-//
-// app.use(cors(corsOptions)) // all routes are now exposed
+const cors = require('cors')
+
+const whitelist = [BASEURL]
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (whitelist.indexOf(origin) !== -1 || !origin) {
+      callback(null, true)
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  },
+  credentials: true
+}
+
+app.use(cors(corsOptions)) // all routes are now exposed
 
 //Setup Mongoose
 const mongoose = require('mongoose');
@@ -58,18 +58,18 @@ app.use(
   })
 )
 
-// const isAuthenticated = (req, res, next) => {
-//     if (req.session.currentUser) {
-//         return next()
-//     } else {
-//         res.status(403).json({msg:"loging require"})
-//     }
-// }
+const isAuthenticated = (req, res, next) => {
+    if (req.session.currentUser) {
+        return next()
+    } else {
+        res.status(403).json({msg:"login required"})
+    }
+}
 
 //controllers
-app.use('/search', require('./controllers/searchController'))
+app.use('/search', isAuthenticated, require('./controllers/searchController'))
 app.use('/users', require('./controllers/userController'))
-app.use('/news', require('./controllers/newsController'))
+app.use('/news', isAuthenticated, require('./controllers/newsController'))
 
 
 app.listen(PORT, () => {
