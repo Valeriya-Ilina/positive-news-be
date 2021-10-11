@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const newsSchema = Schema ({
-  title: {type: String, unique: true, required: true},
+  title: {type: String, required: true},
   author: {type: String},
   url: {type: String},
   description: {type: String},

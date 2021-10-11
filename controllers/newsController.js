@@ -3,6 +3,9 @@ const news = express.Router();
 const News = require('../models/newsModel.js');
 const User = require('../models/usersModel.js');
 
+const NewsAPI = require('newsapi');
+const newsapi = new NewsAPI(process.env.NEWS_API_KEY);
+
 // Get News
 news.get('/', (req, res) => {
   User.findById(req.session.currentUser._id, (error, foundUser) => {
@@ -22,28 +25,33 @@ news.get('/', (req, res) => {
   });
 });
 
-//Add article to news
+// Create articles
 news.post('/', (req, res) => {
-  News.create(req.body, (error, createdArticle) => {
-    if (error) {
-      res.status(400).json({error: error.message})
-    }
-    else {
-      User.findById(req.session.currentUser._id, (error, foundUser) => {
-        if (error) {
-          res.status(400).json({error: error.message})
-        }
-        else {
-          foundUser.news.push(createdArticle)
-          foundUser.save()
-          res.status(201).json(createdArticle)
-        };
-      });
-    };
+  newsapi.v2.topHeadlines(req.body).then(response => {
+    User.findById(req.session.currentUser._id, (error, foundUser) => {
+      if (error) {
+        res.status(400).json({error: error.message})
+      }
+      else {
+        News.create(response.articles, (error, createdArticles) => {
+          if (error) {
+            res.status(400).json({error: error.message})
+          }
+          else {
+            for(let i = 0; i < createdArticles.length; i++) {
+              foundUser.news.push(createdArticles[i])
+            }
+            foundUser.save()
+            res.status(201).json(createdArticles)
+          };
+        });
+      };
+    });
   });
 });
 
-//Update article
+
+// Update article
 news.put('/:id', (req, res) => {
   News.findByIdAndUpdate(req.params.id, req.body, {new:true},
   (error, updatedArticle) => {
@@ -56,7 +64,7 @@ news.put('/:id', (req, res) => {
   });
 });
 
-//Delete article
+// Delete article
 news.delete('/:id', (req, res) => {
   News.findByIdAndDelete(req.params.id, (error, deletedArticle) => {
     if(error) {
