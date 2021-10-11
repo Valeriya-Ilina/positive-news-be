@@ -67,7 +67,6 @@ const isAuthenticated = (req, res, next) => {
 }
 
 //controllers
-app.use('/search', isAuthenticated, require('./controllers/searchController'))
 app.use('/users', require('./controllers/userController'))
 app.use('/news', isAuthenticated, require('./controllers/newsController'))
 
